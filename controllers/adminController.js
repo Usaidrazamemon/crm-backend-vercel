@@ -236,7 +236,7 @@ exports.deleteUser = async (req, res) => {
 // ============ GET LOGIN LOGS ============
 exports.getLogs = async (req, res) => {
   try {
-    const Log = require("../models/Log");
+    const Log = require("../models/log");
     const logs = await Log.find().sort({ createdAt: -1 }).limit(100);
     res.json(logs);
   } catch (error) {
