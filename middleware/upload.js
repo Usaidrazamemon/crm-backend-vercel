@@ -1,3 +1,4 @@
+
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
@@ -9,13 +10,12 @@ cloudinary.config({
 });
 
 const storage = new CloudinaryStorage({
-  cloudinary,
+  cloudinary: cloudinary,
   params: async (req, file) => {
     const isImage = file.mimetype.startsWith("image/");
     return {
       folder: isImage ? "crm/photos" : "crm/docs",
       resource_type: isImage ? "image" : "raw",
-      allowed_formats: ["jpg", "jpeg", "png", "gif", "webp", "pdf", "doc", "docx", "txt"],
     };
   },
 });
