@@ -1,34 +1,25 @@
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
-// Uploads folder banana
-const uploadDir = path.join(__dirname, "../uploads");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-const docsDir = path.join(uploadDir, "docs");
-const photosDir = path.join(uploadDir, "photos");
-if (!fs.existsSync(docsDir)) fs.mkdirSync(docsDir);
-if (!fs.existsSync(photosDir)) fs.mkdirSync(photosDir);
-
-// Storage config
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    if (file.mimetype.startsWith("image/")) {
-      cb(null, photosDir);
-    } else {
-      cb(null, docsDir);
-    }
-  },
-  filename: (req, file, cb) => {
-    const unique = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, unique + path.extname(file.originalname));
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => {
+    const isImage = file.mimetype.startsWith("image/");
+    return {
+      folder: isImage ? "crm/photos" : "crm/docs",
+      resource_type: isImage ? "image" : "raw",
+      allowed_formats: ["jpg", "jpeg", "png", "gif", "webp", "pdf", "doc", "docx", "txt"],
+    };
   },
 });
 
-// File filter
 const fileFilter = (req, file, cb) => {
   const allowed = [
     "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp",
@@ -46,7 +37,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max
+  limits: { fileSize: 10 * 1024 * 1024 },
 });
 
 module.exports = upload;
