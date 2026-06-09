@@ -1,12 +1,10 @@
 const router = require("express").Router();
-const path = require("path");
 const Lead = require("../models/Lead");
 const upload = require("../middleware/upload");
 const auth = require("../middleware/authMiddleware");
 
 router.use(auth);
 
-// Upload docs + photos for a lead
 router.post("/:leadId", upload.fields([
   { name: "docs", maxCount: 10 },
   { name: "photos", maxCount: 10 },
@@ -15,8 +13,9 @@ router.post("/:leadId", upload.fields([
     const lead = await Lead.findById(req.params.leadId);
     if (!lead) return res.status(404).json({ msg: "Lead not found" });
 
-    const docPaths = req.files?.docs?.map(f => `/uploads/docs/${f.filename}`) || [];
-    const photoPaths = req.files?.photos?.map(f => `/uploads/photos/${f.filename}`) || [];
+    // Cloudinary returns secure_url
+    const docPaths = req.files?.docs?.map(f => f.path) || [];
+    const photoPaths = req.files?.photos?.map(f => f.path) || [];
 
     lead.docs = [...lead.docs, ...docPaths];
     lead.photos = [...lead.photos, ...photoPaths];
@@ -28,7 +27,6 @@ router.post("/:leadId", upload.fields([
   }
 });
 
-// Add call log note
 router.post("/:leadId/calllog", async (req, res) => {
   try {
     const { note } = req.body;
