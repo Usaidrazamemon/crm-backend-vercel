@@ -1,3 +1,4 @@
+
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
@@ -8,32 +9,25 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
+const imageStorage = new CloudinaryStorage({
+  cloudinary,
   params: {
-    folder: "crm-uploads",
-    resource_type: "auto",
-    allowed_formats: ["jpg", "jpeg", "png", "gif", "webp", "pdf", "doc", "docx"],
+    folder: "crm/photos",
+    resource_type: "image",
+    allowed_formats: ["jpg", "jpeg", "png", "gif", "webp"],
   },
 });
 
-const fileFilter = (req, file, cb) => {
-  const allowed = [
-    "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp",
-    "application/pdf", "application/msword",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  ];
-  if (allowed.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error("File type not allowed!"), false);
-  }
-};
-
-const upload = multer({
-  storage,
-  fileFilter,
-  limits: { fileSize: 10 * 1024 * 1024 },
+const docStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "crm/docs",
+    resource_type: "raw",
+    allowed_formats: ["pdf", "doc", "docx", "txt"],
+  },
 });
 
-module.exports = upload;
+const imageUpload = multer({ storage: imageStorage, limits: { fileSize: 10 * 1024 * 1024 } });
+const docUpload = multer({ storage: docStorage, limits: { fileSize: 10 * 1024 * 1024 } });
+
+module.exports = { imageUpload, docUpload };
