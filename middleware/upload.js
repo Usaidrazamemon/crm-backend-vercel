@@ -11,6 +11,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// Photos - image only
 const imageStorage = new CloudinaryStorage({
   cloudinary,
   params: {
@@ -20,15 +21,14 @@ const imageStorage = new CloudinaryStorage({
   },
 });
 
+// Docs - raw (pdf, doc, docx, txt)
 const docStorage = new CloudinaryStorage({
   cloudinary,
-  params: async (req, file) => {
-    return {
-      folder: "crm/docs",
-      resource_type: "raw",
-      public_id: `${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9.]/g, "_")}`,
-    };
-  },
+  params: async (req, file) => ({
+    folder: "crm/docs",
+    resource_type: "raw",
+    public_id: `${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9.]/g, "_")}`,
+  }),
 });
 
 const imageUpload = multer({ storage: imageStorage, limits: { fileSize: 4 * 1024 * 1024 } });
