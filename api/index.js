@@ -1,4 +1,5 @@
 
+
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -6,13 +7,21 @@ const connectDB = require("../config/db");
 
 const app = express();
 
+const allowedOrigins = [
+  "https://crm-frontend-seven-steel.vercel.app",
+  "http://localhost:3000",
+];
+
 app.use(cors({
-  origin: [
-    "https://crm-frontend-seven-steel.vercel.app",
-    "http://localhost:3000"
-  ],
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
