@@ -10,7 +10,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Photos storage
+// Photos storage - images work fine
 const imageStorage = new CloudinaryStorage({
   cloudinary,
   params: {
@@ -20,18 +20,14 @@ const imageStorage = new CloudinaryStorage({
   },
 });
 
-// Docs storage - PDF as image so it's publicly accessible
+// Docs - upload as image with pdf format so publicly accessible
 const docStorage = new CloudinaryStorage({
   cloudinary,
-  params: async (req, file) => {
-    const ext = file.originalname.split('.').pop().toLowerCase();
-    const isPdf = ext === 'pdf';
-    return {
-      folder: "crm/docs",
-      resource_type: isPdf ? "image" : "raw",
-      format: isPdf ? "pdf" : undefined,
-      public_id: `${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9.]/g, "_")}`,
-    };
+  params: {
+    folder: "crm/docs",
+    resource_type: "image",
+    allowed_formats: ["pdf"],
+    format: "pdf",
   },
 });
 
