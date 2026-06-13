@@ -17,16 +17,20 @@ const imageStorage = new CloudinaryStorage({
   params: {
     folder: "crm/photos",
     resource_type: "image",
+    type: "upload",
+    access_mode: "public",
     allowed_formats: ["jpg", "jpeg", "png", "gif", "webp"],
   },
 });
 
-// Docs - raw (pdf, doc, docx, txt)
+// Docs - raw (pdf, doc, docx, txt) - public access
 const docStorage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => ({
     folder: "crm/docs",
     resource_type: "raw",
+    type: "upload",
+    access_mode: "public",
     public_id: `${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9.]/g, "_")}`,
   }),
 });
