@@ -10,24 +10,25 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Photos storage - images work fine
+// Photos storage
 const imageStorage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: "crm/photos",
     resource_type: "image",
+    upload_preset: "ml_default",
     allowed_formats: ["jpg", "jpeg", "png", "gif", "webp"],
   },
 });
 
-// Docs - upload as image with pdf format so publicly accessible
+// Docs storage
 const docStorage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: "crm/docs",
-    resource_type: "image",
-    allowed_formats: ["pdf"],
-    format: "pdf",
+    resource_type: "raw",
+    upload_preset: "ml_default",
+    public_id: undefined,
   },
 });
 
