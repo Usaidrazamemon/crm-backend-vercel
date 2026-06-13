@@ -1,4 +1,3 @@
-
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
@@ -9,28 +8,21 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Photos storage - images
+// Photos - images only
 const imageStorage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: "crm/photos",
     resource_type: "image",
-    allowed_formats: ["jpg", "jpeg", "png", "gif", "webp"],
   },
 });
 
-// Docs storage - PDF as image (publicly accessible)
+// Docs - all files as raw
 const docStorage = new CloudinaryStorage({
   cloudinary,
-  params: async (req, file) => {
-    const ext = file.originalname.split('.').pop().toLowerCase();
-    return {
-      folder: "crm/docs",
-      resource_type: "image",
-      format: ext === "pdf" ? "pdf" : ext,
-      allowed_formats: ["pdf", "jpg", "jpeg", "png"],
-      public_id: `doc_${Date.now()}`,
-    };
+  params: {
+    folder: "crm/docs",
+    resource_type: "raw",
   },
 });
 
