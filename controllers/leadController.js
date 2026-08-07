@@ -140,3 +140,40 @@ exports.saveDraft = async (req, res) => {
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 };
+
+// ============ UPDATE MY LEAD (Agent) ============
+// Agents can only edit their own leads, and only basic/contact/address fields.
+// Verification, workflow, and payment fields stay admin/verifier-only.
+const AGENT_EDITABLE_FIELDS = [
+  "firstName", "lastName", "primaryEmail", "mobilePhone", "secondaryPhone",
+  "accountNumber", "ssn", "assignedTo",
+  "address", "address2", "city", "usState", "zip", "zipcode4", "county",
+  "campaign", "channel", "area", "rep", "creditRisk", "followUp", "link",
+];
+
+exports.updateMyLead = async (req, res) => {
+  try {
+    const lead = await Lead.findOne({ _id: req.params.leadId, agent: req.user.id });
+    if (!lead) return res.status(404).json({ msg: "Lead not found" });
+
+    const updates = {};
+    for (const field of AGENT_EDITABLE_FIELDS) {
+      if (Object.prototype.hasOwnProperty.call(req.body, field)) {
+        updates[field] = req.body[field];
+      }
+    }
+    updates.updatedAt = new Date();
+
+    const updatedLead = await Lead.findByIdAndUpdate(
+      req.params.leadId,
+      updates,
+      { new: true }
+    )
+      .populate("agent", "name email agentType agentId")
+      .populate("verifiedBy", "name email");
+
+    res.json({ msg: "Lead updated successfully", lead: updatedLead });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+};
