@@ -5,6 +5,7 @@ const {
   getMyVerifiedLeads,
   getLeadById,
   saveDraft,
+  updateMyLead,
 } = require("../controllers/leadController");
 
 const auth = require("../middleware/authMiddleware");
@@ -20,5 +21,6 @@ router.post("/draft", saveDraft);                    // Draft save karo
 router.get("/", getMyLeads);                         // Apne saare leads
 router.get("/verified", getMyVerifiedLeads);         // Apne verified leads
 router.get("/:leadId", getLeadById);                 // Single lead detail
+router.put("/:leadId", updateMyLead);                // Apna lead edit karo (basic/address info)
 
 module.exports = router;
