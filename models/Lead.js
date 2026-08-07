@@ -56,7 +56,7 @@ const leadSchema = new mongoose.Schema(
     },
     workflowStatus: {
       type: String,
-      enum: ["Pending", "Pass", "Cancel", "Fraud", "Duplicate"],
+      enum: ["Pending", "Pass", "Cancel", "Fraud", "Duplicate", "Reject"],
       default: "Pending",
     },
     assignedTo: { type: String, default: "" },
