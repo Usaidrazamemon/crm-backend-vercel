@@ -111,7 +111,7 @@ const leadSchema = new mongoose.Schema(
     // ============ OVERALL STATUS ============
     status: {
       type: String,
-      enum: ["Unverified", "Verified", "Processed", "Rejected"],
+      enum: ["Unverified", "Verified", "Processed", "Rejected", "Chargeback"],
       default: "Unverified",
     },
   },
