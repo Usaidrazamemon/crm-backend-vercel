@@ -142,13 +142,14 @@ exports.saveDraft = async (req, res) => {
 };
 
 // ============ UPDATE MY LEAD (Agent) ============
-// Agents can only edit their own leads, and only basic/contact/address fields.
-// Verification, workflow, and payment fields stay admin/verifier-only.
+// Agents can edit all fields of their own leads.
 const AGENT_EDITABLE_FIELDS = [
   "firstName", "lastName", "primaryEmail", "mobilePhone", "secondaryPhone",
   "accountNumber", "ssn", "assignedTo",
   "address", "address2", "city", "usState", "zip", "zipcode4", "county",
   "campaign", "channel", "area", "rep", "creditRisk", "followUp", "link",
+  "workflowStatus", "workOrder", "prepayment", "verifierRemarks",
+  "status", "paymentStatus",
 ];
 
 exports.updateMyLead = async (req, res) => {
