@@ -213,11 +213,40 @@ exports.createAgentProfile = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   try {
+    // Never let a raw/plaintext password slip through this generic update —
+    // password changes must go through changeUserPassword (which hashes it).
+    const { password, ...safeUpdates } = req.body;
+
     const user = await User.findByIdAndUpdate(
-      req.params.userId, req.body, { new: true }
+      req.params.userId, safeUpdates, { new: true }
     ).select("-password");
     if (!user) return res.status(404).json({ msg: "User not found" });
     res.json({ msg: "User updated", user });
+  } catch (error) {
+    res.status(500).json({ msg: "Server error", error: error.message });
+  }
+};
+
+// ============ CHANGE USER PASSWORD (Admin only) ============
+exports.changeUserPassword = async (req, res) => {
+  try {
+    const { newPassword } = req.body;
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({ msg: "Password must be at least 6 characters" });
+    }
+
+    const bcrypt = require("bcryptjs");
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    const user = await User.findByIdAndUpdate(
+      req.params.userId,
+      { password: hashedPassword },
+      { new: true }
+    ).select("-password");
+    if (!user) return res.status(404).json({ msg: "User not found" });
+
+    res.json({ msg: "Password changed successfully", user });
   } catch (error) {
     res.status(500).json({ msg: "Server error", error: error.message });
   }
@@ -236,7 +265,7 @@ exports.deleteUser = async (req, res) => {
 // ============ GET LOGIN LOGS ============
 exports.getLogs = async (req, res) => {
   try {
-    const Log = require("../models/log");
+    const Log = require("../models/Log");
     const logs = await Log.find().sort({ createdAt: -1 }).limit(100);
     res.json(logs);
   } catch (error) {
