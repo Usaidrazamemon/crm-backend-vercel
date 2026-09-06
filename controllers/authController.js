@@ -1,5 +1,5 @@
 const User = require("../models/User");
-const Log = require("../models/log");
+const Log = require("../models/Log");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -41,6 +41,11 @@ exports.loginUser = async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
+
+    // Disabled accounts (status: "Inactive") can't log in
+    if (user.status === "Inactive") {
+      return res.status(403).json({ msg: "This account has been disabled. Please contact your admin." });
+    }
 
     try {
       await Log.create({
