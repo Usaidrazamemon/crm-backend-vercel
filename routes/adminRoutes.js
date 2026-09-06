@@ -4,6 +4,7 @@ const {
   updatePaymentStatus, getProcessedLeads,
   getDashboardStats,
   getAllUsers, getUsersByRole, createAgentProfile, updateUser, deleteUser,
+  changeUserPassword,
   getLogs, getNextWorkOrder,
 } = require("../controllers/adminController");
 
@@ -31,6 +32,7 @@ router.get("/users", getAllUsers);
 router.get("/users/role/:role", getUsersByRole);
 router.post("/users/create-agent", createAgentProfile);
 router.put("/users/:userId", updateUser);
+router.put("/users/:userId/password", changeUserPassword);
 router.delete("/users/:userId", deleteUser);
 
 // Logs
