@@ -8,24 +8,31 @@ const connectDB = require("../config/db");
 const app = express();
 
 const allowedOrigins = [
+  "https://connectcareglobal.com",
+  "https://www.connectcareglobal.com",
   "https://crm-frontend-seven-steel.vercel.app",
   "http://localhost:3000",
-];
+  process.env.FRONTEND_URL,
+]
+  .filter(Boolean)
+  .map((o) => o.trim().replace(/\/$/, ""));
 
-app.use(cors({
-  origin: function(origin, callback) {
+const corsOptions = {
+  origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(null, false);
     }
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"],
-}));
+};
 
-app.options("*", cors());
+app.use(cors(corsOptions));
+
+app.options("*", cors(corsOptions));
 
 app.use(express.json());
 
